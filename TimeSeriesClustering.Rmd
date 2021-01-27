@@ -1,0 +1,115 @@
+# ------------------ Chargement des librairies
+
+
+```{r warning=FALSE,message=FALSE}
+# Define parameters
+Nombre_de_groupes <- 9
+
+
+#  Librairies
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(plotly)
+library(leaflet)
+library(readr)
+library(data.table)
+library(scales)
+library(Quandl)
+library(ggrepel)
+library(TSclust)
+library(ggdendro)
+library(dendextend)
+library(DT)
+library(htmltools)
+library(dygraphs)
+library(chron)
+library(timeDate)
+library(gridExtra)
+library(knitr)
+library(tinytex)
+library(zoo)
+library(fst)
+library(readr)
+
+
+# Read input data 
+data <- fread("data_clustering.csv",dec = ",")
+
+# Count point number per time serie 
+Nombre_points <- data %>% group_by(ID) %>% summarise(Nombre_valeur = length(unique(Valeur))) %>% arrange(Nombre_valeur) %>%  as.data.table()
+
+# Data threatment 
+data_traite <- data %>% 
+  filter(ID %in% unique(Nombre_points[Nombre_valeur >= 5,]$ID)) %>% # Keep time series comporting at least 5 different values 
+  group_by(ID) %>% 
+  mutate(Valeur = Valeur/mean(Valeur,na.rm = T)) %>%
+  spread(key = ID,value = Valeur) %>% 
+  mutate_at(vars(-Heure),funs(ifelse(is.na(.),0,.))) %>% # Replace null values by 0 
+  mutate_at(vars(-Heure),funs(./mean(.,na.rm = T))) %>% # Normalization 
+  mutate_at(vars(-Heure),funs(broom::augment(smooth.spline(Heure,.,df = 8))$.fitted)) %>% # Polynomial regression of degree 8
+  as.data.table()
+
+
+# Plot time series 
+dygraph(data_traite)
+
+
+# Convert data to tile series object
+dtats1 <- ts(data_traite[,2:ncol(data_traite)])  
+
+# Built dissimilarity matrices
+CORT.dis1 <- diss(dtats1, "CORT")
+
+# Plot clustering tree
+plot(hclust(CORT.dis1))
+
+# Cut tree from hclust function
+CORT.hclus1 <- cutree(hclust(CORT.dis1),k = Nombre_de_groupes)
+
+# Build data from graphics 
+dtaLngC_cluster1 <-data_traite %>%
+  gather(key = ID,value = Valeur,-Heure) %>%
+  as.data.table() %>% 
+  mutate(Cluster = as.vector(sapply(CORT.hclus1,FUN = rep,times = 24))) %>% # 24 car il s'agit de données horaires (24 valeurs dans la chronique)
+  as.data.table() 
+
+
+# Plot clusters
+ggplot(data=dtaLngC_cluster1, aes(x=Heure, y=Valeur),height = 600)+
+  geom_line(aes(color=ID, group = ID))+
+  facet_wrap(~Cluster)+
+  theme(legend.position="bottom")+
+  theme(legend.position="none")+
+  theme(axis.title.x=element_blank())+
+  labs(title = "Clustering sur les profils de conso horaire",
+        subtitle = "Valeurs normalisees (base:1)",
+    y="Rates", color="")
+
+
+
+# Fabrication du profil moyen par cluster 
+PROFILS_TYPES <- dtaLngC_cluster1 %>% 
+  group_by(Cluster,Heure) %>% 
+  summarise(Valeur = mean(Valeur,na.rm = T))
+
+
+# Fabrication du graphe des profils moyens
+ggplot(data=PROFILS_TYPES, aes(x=Heure, y=Valeur),height = 600)+
+  geom_line()+
+  facet_wrap(~Cluster)+
+  theme(legend.position="bottom")+
+  theme(legend.position="none")+
+  theme(axis.title.x=element_blank())+
+  labs(title = "Clustering sur les profils de conso horaire",
+       subtitle = "Valeurs normalisees (base:1)",
+       y="Rates", color="")
+
+```
+
+
+
+
+
+
+
