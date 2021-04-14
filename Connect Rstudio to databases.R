@@ -3,19 +3,19 @@
 
 #Telecharger le driver JDBC au lien suivant :
 # http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html 
-# Telecharger le fichier ojdbc6.jar et le placer dans un dossier  (ex : driver_JDBC ) que l'on aura préalablement créé
+# Telecharger le fichier ojdbc6.jar et le placer dans un dossier  (ex : driver_JDBC ) que l'on aura prÃ©alablement crÃ©Ã©
 
 # Installer le package RJDBC 
-install.package(« RJDBC »)
+install.package(Â« RJDBC Â»)
 
-# Configurer le driver JDBC a l'aide de la commande JDBC ( attention a préciser le bon chemin pour le fichier ojdbc6.jar)
+# Configurer le driver JDBC a l'aide de la commande JDBC ( attention a prÃ©ciser le bon chemin pour le fichier ojdbc6.jar)
 jdbcDriver <- JDBC(driverClass="oracle.jdbc.OracleDriver", classPath="C:/driver_JDBC/ojdbc6.jar","'")
 
-# Lancer la commande dbConnect avec les paramètres de la base Oracle
+# Lancer la commande dbConnect avec les paramÃ¨tres de la base Oracle
 conn_jdbc <- dbConnect(jdbcDriver,  "jdbc:oracle:thin:@SERVEUR24.domaine.exploitation.groupve.local:1432:v8", "uid", "pwd",encoding="UTF-8")
 
 
-# ********************************* CONNECTION BASE ORACLE *******************************
+# ********************************* CONNECTION SQL SERVER *******************************
 # Chargement du package RJDBC
 library(RJDBC)
 
