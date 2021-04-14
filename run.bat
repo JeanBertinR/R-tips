@@ -1,4 +1,4 @@
-title Appli_Secto
+title Nom_appli
 @echo off
 
 set cwd=%~dp0
