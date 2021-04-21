@@ -1,0 +1,31 @@
+### On suivra le modop détaillé au lien suivant :
+  http://www.geo.uzh.ch/microsite/reproducible_research/post/rr-rstudio-git/
+  
+### Juste apres le point 3 de la partie 1, taper dans le git shell les commandes suivantes :
+  git config --global https.proxy ADRESSE_HTTPS_PROXY ( EXEMPLE:http://lyon@gateway.zaler.net:1212/)
+  git config --global http.proxy ADRESSE_HTTP_PROXY
+  
+### Puis taper également la commande suivante pour désactiver la vérification SSL
+#### (source : https://stackoverflow.com/questions/23885449/unable-to-resolve-unable-to-get-local-issuer-certificate-using-git-on-windows ) 
+
+git config --global http.sslVerify false
+
+Si nécessaire taper le mot de passe lors de l’identification Zscaler pour le proxy une fois que l’on a créer un projet via « Version Control »
+  
+
+### Si necessaire, pour effacer le nouveau paramétrage : 
+git config --global --unset http.proxy 
+•	git config --global --unset https.proxy
+
+### Pour voir la confiuration de Proxy actuelle
+git config --global --get-regexp http.*
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
