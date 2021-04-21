@@ -1,0 +1,5 @@
+# To set proxy parameter
+Sys.setenv(https_proxy = "http://url_proxy:port_proxy/")
+
+#Then you can install pacakge from github like shinyML
+devtools::install_github("JeanBertinR/shinyML",force = T)
